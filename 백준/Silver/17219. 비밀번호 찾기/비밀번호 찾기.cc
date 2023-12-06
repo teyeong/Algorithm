@@ -1,6 +1,5 @@
 #include <iostream>
 #include <unordered_map>
-
 using namespace std;
 
 int main()
@@ -9,7 +8,6 @@ int main()
     ios::sync_with_stdio(false);
     
     unordered_map<string, string> memo;
-    
     int N, M;
     cin >> N >> M;
     
@@ -19,7 +17,6 @@ int main()
         memo.insert(make_pair(savedSite, pw));
     }
     
-    unordered_map<string, string>::iterator iter;
     string site;
     for (int j = 0; j < M; j++) {
         cin >> site;
@@ -28,6 +25,5 @@ int main()
             cout << ans->second << '\n';
         }
     }
-    
     return 0;
 }
