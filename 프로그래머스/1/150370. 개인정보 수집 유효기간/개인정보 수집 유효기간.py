@@ -2,15 +2,12 @@ import re
 
 def solution(today, terms, privacies):
     answer = []
-    #terms_list = [[0] * 2 for k in range(len(terms))]
     terms_alpha = []
     terms_dura = []
     today_list = list(map(int, re.split('[.]', today)))
     
     for j in range(len(terms)):
         alphabet, duration = re.split('[ ]', terms[j])
-        #terms_list[j][0] = alphabet
-        #terms_list[j][1] = int(duration)
         terms_alpha.append(alphabet)
         terms_dura.append(int(duration))
     
@@ -36,13 +33,10 @@ def solution(today, terms, privacies):
             answer.append(i + 1)
             continue
         
-        
         if (result_year == today_list[0]):
             if (result_month < today_list[1]):
                 answer.append(i + 1)
             elif (result_month == today_list[1]):
                 if (result_day <= today_list[2]):
                     answer.append(i + 1)
-        
-        
     return answer
