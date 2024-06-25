@@ -1,7 +1,7 @@
 N, M = map(int, input().split())
 race1 = []
 race2 = []
-player1 = [i for i in range(1, N + 1)] # 첫 번째 경주에 참여하는 선수 목록
+
 for j in range(N):
     rank = int(input())
     race1.insert(rank - 1, j + 1)
