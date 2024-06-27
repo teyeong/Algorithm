@@ -6,7 +6,6 @@ arr.sort()
 arr = [k for k in arr if k < x]
 start, end = 0, len(arr) - 1
 while start < end:
-    mid = (start + end) // 2
     temp = arr[start] + arr[end]
     if x == temp:
         cnt += 1
