@@ -1,5 +1,6 @@
 import sys
 sys.setrecursionlimit(10 ** 6) # 재귀 깊이 설정
+input = sys.stdin.readline
 
 def dfs(x, y, visit, limit):
     visit[x][y] = True
@@ -8,12 +9,9 @@ def dfs(x, y, visit, limit):
         nx = x + dx[i]
         ny = y + dy[i]
         
-        if nx < 0  or nx >= N or ny < 0 or ny >= N:
-            continue
-        
-        if rain[nx][ny] > limit and visit[nx][ny] == False:
-            visit = dfs(nx, ny, visit, limit)
-    return visit
+        if 0 <= nx < N and 0 <= ny < N:
+            if not visit[nx][ny] and rain[nx][ny] > limit:
+                dfs(nx, ny, visit, limit)
 
 N = int(input())
 
@@ -30,9 +28,9 @@ for limit in range(max_height + 1):
     cnt = 0
     for x in range(N):
         for y in range(N):
-            if rain[x][y] > limit and visit[x][y] == False:
+            if not visit[x][y] and rain[x][y] > limit:
                 cnt += 1
-                visit = dfs(x, y, visit, limit)
+                dfs(x, y, visit, limit)
     max_area = max(max_area, cnt)
     
 print(max_area)
