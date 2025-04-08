@@ -1,14 +1,6 @@
 import sys
 input = sys.stdin.readline
 
-'''
-현재 칸이 아직 청소 X -> 현재 칸 청소
-
-현재 칸 주위 4칸(상하좌우) 중 모두 청소되어 있다면 -> 방향 유지, 후진 가능 ? 후진 : 작동 중지(프로그램 종료)
-현재 칸 주위 4칸 중 청소할 수 있는 경우 -> 반시계방향 90도(왼쪽) 회전
-바라보는 방향 기준 앞쪽 칸이 청소되지 않은 빈칸인 경우 ? 한칸 전진 : 왼쪽으로 회전
-'''
-
 N, M = map(int, input().split())
 r, c, d = map(int, input().split())
 # d: 방향
@@ -28,21 +20,12 @@ cnt = 0 # 청소하는 방의 개수
 dx = [1, -1, 0, 0]
 dy = [0, 0, 1, -1]
 
-# 전진하는 함수
-def front(x, y, d):
+# 좌표 반환 함수
+def position(x, y, d):
     if d == 0: x -= 1
     elif d == 1: y += 1
     elif d == 2: x += 1
     elif d == 3: y -= 1
-    
-    return x, y
-    
-# 후진하는 함수
-def back(x, y, d):
-    if d == 0: x += 1
-    elif d == 1: y -= 1
-    elif d == 2: x -= 1
-    elif d == 3: y += 1
     
     return x, y
 
@@ -65,14 +48,14 @@ while True:
         while True:
             d = (d - 1) % 4
             
-            nr, nc = front(r, c, d)
+            nr, nc = position(r, c, d)
             if 0 <= nr < N and 0 <= nc < M:
                 if room[nr][nc] == 0:
                     r = nr
                     c = nc
                     break
     else: # 주위가 모두 청소된 경우
-        nr, nc = back(r, c, d)
+        nr, nc = position(r, c, (d + 2) % 4)
         if 0 <= nr < N and 0 <= nc < M and room[nr][nc] != 1:
             r = nr
             c = nc
