@@ -22,13 +22,14 @@ for i in range(M):
     x, y = warriors_position[i * 2], warriors_position[i * 2 + 1]
     warriors.append([x, y])
 
-# 상 (x - 1, y) index: 0
-# 하 (x + 1, y) index: 1
-# 좌 (x, y - 1) index: 2
-# 우 (x, y + 1) index: 3
+# 상 (x - 1, y)
+# 하 (x + 1, y)
+# 좌 (x, y - 1)
+# 우 (x, y + 1)
 dx = [-1, 1, 0, 0]
 dy = [0, 0, -1, 1]
 
+# 좌우상하
 dx2 = [0, 0, -1, 1]
 dy2 = [-1, 1, 0, 0]
 
@@ -62,20 +63,11 @@ if distance_map[sr][sc] == 0:
     print(-1)
     exit()
 
-# 이동 함수
-def move(x, y, d):
-    if d == 0: x -= 1
-    elif d == 1: x += 1
-    elif d == 2: y -= 1
-    elif d == 3: y += 1
-    return x, y
-
 # 메두사 시야각 측정
 def sight(x, y, d):
-    sight_result = [] # 반환값
+    sight_result = [] # 메두사 시선에 닿는 좌표
     behind = set() # 전사에 의해 가려진 좌표
     stone_result = [] # 돌로 변하는 전사 좌표
-    cnt = 0 # 전사 수
     warriors_set = set(map(tuple, warriors))
     
     # for문 조건
@@ -99,7 +91,6 @@ def sight(x, y, d):
                 sight_result.append([i, ly])
                 if (i, ly) in warriors_set:
                     num = warriors.count([i, ly])
-                    cnt += num
                     for _ in range(num):
                         stone_result.append([i, ly])
                     for wx in range(i + con[0], con[1], con[2]):
@@ -115,7 +106,6 @@ def sight(x, y, d):
                 sight_result.append([i, ry])
                 if (i, ry) in warriors_set:
                     num = warriors.count([i, ry])
-                    cnt += num
                     for _ in range(num):
                         stone_result.append([i, ry])
                     for wx in range(i + con[0], con[1], con[2]):
@@ -130,7 +120,6 @@ def sight(x, y, d):
             sight_result.append([i, y])
             if (i, y) in warriors_set:
                 num = warriors.count([i, y])
-                cnt += num
                 for _ in range(num):
                     stone_result.append([i, y])
                 for wx in range(i + con[0], con[1], con[2]):
@@ -145,7 +134,6 @@ def sight(x, y, d):
                 sight_result.append([lx, i])
                 if (lx, i) in warriors_set:
                     num = warriors.count([lx, i])
-                    cnt += num
                     for _ in range(num):
                         stone_result.append([lx, i])
                     for wy in range(i + con[0], con[1], con[2]):
@@ -161,7 +149,6 @@ def sight(x, y, d):
                 sight_result.append([rx, i])
                 if (rx, i) in warriors_set:
                     num = warriors.count([rx, i])
-                    cnt += num
                     for _ in range(num):
                         stone_result.append([rx, i])
                     for wy in range(i + con[0], con[1], con[2]):
@@ -176,7 +163,6 @@ def sight(x, y, d):
             sight_result.append([x, i])
             if (x, i) in warriors_set:
                 num = warriors.count([x, i])
-                cnt += num
                 for _ in range(num):
                     stone_result.append([x, i])
                 for wy in range(i + con[0], con[1], con[2]):
@@ -197,7 +183,6 @@ def move_warrior(warriors, stone, vision, mx, my, dx, dy):
     for idx, [x, y] in enumerate(warriors):
         if (x, y) in stone_set: continue
         min_gap = 100
-        min_idx = -1
         min_xy = None
         for j in range(4):
             nx = x + dx[j]
@@ -206,11 +191,9 @@ def move_warrior(warriors, stone, vision, mx, my, dx, dy):
                 gap = abs(nx - mx) + abs(ny - my)
                 if gap < min_gap:
                     min_gap = gap
-                    min_idx = j
                     min_xy = (nx, ny)
                 elif gap == min_gap:
                     if min_xy in vision_set and (nx, ny) not in vision_set:
-                        min_idx = j
                         min_xy = (nx, ny)
         
         
@@ -249,7 +232,8 @@ while True:
                     min_gap = distance_map[nx][ny]
                     min_idx = i
     
-    mx, my = move(mx, my, min_idx)
+    mx = mx + dx[min_idx]
+    my = my + dy[min_idx]
     if [mx, my] in warriors:
         # 이동한 위치에 전사가 존재하는 경우
         while [mx, my] in warriors:
@@ -258,14 +242,11 @@ while True:
     # 2. 메두사의 시선
     real_vision = []
     real_stone = [] # 중복 포함
-    # 현재 메두사가 바라보는 방향
-    sight_idx = -1
     for i in range(4):
         temp_vision, temp_stone = sight(mx, my, i)
         if len(temp_stone) > len(real_stone):
             real_vision = temp_vision
             real_stone = temp_stone
-            sight_idx = i
     
     # 3. 전사 이동
     # 첫 번째 이동
