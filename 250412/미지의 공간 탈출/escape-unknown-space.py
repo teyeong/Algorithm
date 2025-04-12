@@ -89,31 +89,98 @@ for i in range(N):
 time_distance = [[0] * (3 * M) for _ in range(3 * M)]
 visited = [[False] * (3 * M) for _ in range(3 * M)]
 connect2 = [-1, -1] # 시간의 벽에서 미지의 공간으로 나올 수 있는 위치 (시간의 벽에 있는 좌표)
-if direction == 0:
-    connect2 = [3 * M - 1, M + tempy + 1]
-elif direction == 1:
-    connect2 = [0, M + tempy + 1]
-elif direction == 2:
-    connect2 = [M + tempx + 1, 3 * M - 1]
-else:
-    connect2 = [M + tempx + 1, 0]
+if direction == 0: # 남
+    connect2 = [3 * M - 1, M + distance]
+elif direction == 1: # 북
+    connect2 = [0, M + distance]
+elif direction == 2: # 동
+    connect2 = [M + distance, 3 * M - 1]
+else: # 서
+    connect2 = [M + distance, 0] # 확인 필필
 
 queue = deque()
 queue.append(tuple(connect2))
 visited[connect2[0]][connect2[1]] = True
+
+def time_wall_move(nx, ny, i):
+    curr_direction = -1
+    # 동서남북 위치 찾기
+    if 2 * M <= nx < 3 * M and M <= ny < 2 * M:
+        curr_direction = 0 # 남
+    elif 0 <= nx < M and M <= ny < 2 * M:
+        curr_direction = 1 # 북
+    elif M <= nx < 2 * M and 2 * M <= ny < 3 * M:
+        curr_direction = 2 # 동
+    elif M <= nx < 2 * M and 0 <= ny < M:
+        curr_direction = 3 # 서
+    
+    if i == 0: # 남
+        if curr_direction == 3:
+            nx += 1
+            ny += 1
+            while time_wall[nx][ny] == -1:
+                nx += 1
+                ny += 1
+        elif curr_direction == 2:
+            nx += 1
+            ny -= 1
+            while time_wall[nx][ny] == -1:
+                nx += 1
+                ny -= 1
+    elif i == 1: # 북
+        if curr_direction == 3:
+            nx -= 1
+            ny += 1
+            while time_wall[nx][ny] == -1:
+                nx -= 1
+                ny += 1
+        elif curr_direction == 2:
+            nx -= 1
+            ny -= 1
+            while time_wall[nx][ny] == -1:
+                nx -= 1
+                ny -= 1
+    elif i == 2: # 동
+        if curr_direction == 0:
+            nx -= 1
+            ny += 1
+            while time_wall[nx][ny] == -1:
+                nx -= 1
+                ny += 1
+        elif curr_direction == 1:
+            nx += 1
+            ny += 1
+            while time_wall[nx][ny] == -1:
+                nx += 1
+                ny += 1
+    elif i == 3: # 서
+        if curr_direction == 0:
+            nx -= 1
+            ny -= 1
+            while time_wall[nx][ny] == -1:
+                nx -= 1
+                ny -= 1
+        elif curr_direction == 1:
+            nx += 1
+            ny -= 1
+            while time_wall[nx][ny] == -1:
+                nx += 1
+                ny -= 1
+    return nx, ny
+
 while queue:
     x, y = queue.popleft()
     for i in range(4):
         nx = x + dx[i]
         ny = y + dy[i]
-        if 0 <= nx < 3 * M and 0 <= ny < 3 * M:
+        if 0 <= nx < (3 * M) and 0 <= ny < (3 * M):
             if time_wall[nx][ny] == -1:
-                nx, ny = y, x
-            if not visited[nx][ny] and time_wall[nx][ny] == 0 or time_wall[nx][ny] == 2:
+                nx, ny = time_wall_move(x, y, i)
+            if not visited[nx][ny] and (time_wall[nx][ny] == 0 or time_wall[nx][ny] == 2):
                 time_distance[nx][ny] = time_distance[x][y] + 1
                 queue.append((nx, ny))
                 visited[nx][ny] = True
-
+    
 # 시간 이상 현상 좌표
 anomaly = set()
 # 초기값 세팅
@@ -129,12 +196,13 @@ def disposal(turn):
         x, y = time_wrong[i][0], time_wrong[i][1]
         d = time_wrong[i][2]
         v = time_wrong[i][3]
+        # if turn % v == 0:
         d_idx = (d + 2) % 4 # 방향 인덱스
         for _ in range(turn % v):
             nx = x + dx[d_idx]
             ny = y + dy[d_idx]
             if 0 <= nx < N and 0 <= ny < N:
-                if place[nx][ny] == 0 or place[nx][ny] == 4 and (nx, ny) not in anomaly:
+                if place[nx][ny] == 0 and (nx, ny) not in anomaly:
                     anomaly.add((nx, ny))
                     time_wrong[i][0] = nx
                     time_wrong[i][1] = ny
@@ -176,9 +244,14 @@ if place_distance[connect1[0]][connect1[1]] == 0:
 if time_distance[r][c] == 0:
     print(-1)
     exit()
+    
 while True:
     turn += 1
-
+    
+    # 시간 이상 현상 확산
+    # flag = disposal(turn)
+    
+    
     # 타임머신 이동
     if where == 0 and [r, c] == connect2:
         # 현재 위치가 시간의 벽 -> 미지의 공간 넘어가는 위치인 경우
@@ -188,7 +261,7 @@ while True:
         if flag == True:
             # 미지의 공간 최단 거리 재설정
             place_distance = check_road()
-            if connect1 != end and place_distance[r][c] == 0:
+            if connect1 != end and place_distance[connect1[0]][connect1[1]] == 0:
                 # 도달 불가
                 print(-1)
                 exit()
@@ -202,7 +275,7 @@ while True:
                 # 시간의 벽
                 if 0 <= nr < (3 * M) and 0 <= nc < (3 * M):
                     if time_wall[nr][nc] == -1:
-                        nr, nc = c, r
+                        nr, nc = time_wall_move(r, c, i)
                     if time_wall[nr][nc] == 0 and min_dis > time_distance[nr][nc]:
                         min_dis = time_distance[nr][nc]
                         min_pos = [nr, nc]
@@ -212,7 +285,6 @@ while True:
                     if (place[nr][nc] == 0 or place[nr][nc] == 4) and (nr, nc) not in anomaly and min_dis > place_distance[nr][nc]:
                         min_dis = place_distance[nr][nc]
                         min_pos = [nr, nc]
-
         r, c = min_pos
     if where == 1 and place[r][c] == 4:
         # 탈출구 도착
