@@ -180,7 +180,7 @@ while queue:
                 time_distance[nx][ny] = time_distance[x][y] + 1
                 queue.append((nx, ny))
                 visited[nx][ny] = True
-    
+
 # 시간 이상 현상 좌표
 anomaly = set()
 # 초기값 세팅
@@ -206,6 +206,8 @@ def disposal(turn):
                     anomaly.add((nx, ny))
                     time_wrong[i][0] = nx
                     time_wrong[i][1] = ny
+                    x = nx
+                    y = ny
                     flag = True
     if tuple(end) in anomaly:
         # 도달 불가
@@ -231,7 +233,6 @@ def check_road():
                     visited[nx][ny] = True
                     place_distance[nx][ny] = place_distance[x][y] + 1
     return place_distance
-    
 
 # 턴 수
 turn = 0
@@ -247,11 +248,7 @@ if time_distance[r][c] == 0:
     
 while True:
     turn += 1
-    
-    # 시간 이상 현상 확산
-    # flag = disposal(turn)
-    
-    
+
     # 타임머신 이동
     if where == 0 and [r, c] == connect2:
         # 현재 위치가 시간의 벽 -> 미지의 공간 넘어가는 위치인 경우
