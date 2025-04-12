@@ -198,7 +198,7 @@ def disposal(turn):
         v = time_wrong[i][3]
         # if turn % v == 0:
         d_idx = (d + 2) % 4 # 방향 인덱스
-        for _ in range(turn % v):
+        for _ in range(turn // v):
             nx = x + dx[d_idx]
             ny = y + dy[d_idx]
             if 0 <= nx < N and 0 <= ny < N:
