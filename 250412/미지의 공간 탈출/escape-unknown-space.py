@@ -170,6 +170,12 @@ turn = 0
 r, c = start[0] + M, start[1] + M
 where = 0 # 0: 시간의 벽, 1: 미지의 공간
 place_distance = check_road()
+if place_distance[connect1[0]][connect1[1]] == 0:
+    print(-1)
+    exit()
+if time_distance[r][c] == 0:
+    print(-1)
+    exit()
 while True:
     turn += 1
 
@@ -182,7 +188,7 @@ while True:
         if flag == True:
             # 미지의 공간 최단 거리 재설정
             place_distance = check_road()
-            if connect1 != end and place_distance[connect1[0]][connect1[1]] == 0:
+            if connect1 != end and place_distance[r][c] == 0:
                 # 도달 불가
                 print(-1)
                 exit()
