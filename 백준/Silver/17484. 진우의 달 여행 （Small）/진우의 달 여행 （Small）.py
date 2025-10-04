@@ -17,7 +17,6 @@ def dfs(x, y, d):
     if dp[x][y][d] != float('inf'):
         return dp[x][y][d]
     
-    res = []
     for i in range(3):
         if i != d:
             nx = x + dx[i]
@@ -29,7 +28,6 @@ def dfs(x, y, d):
 
 min_res = float('inf')
 for i in range(M):
-    for j in range(3):
-        min_res = min(min_res, dfs(0, i, j))
+    min_res = min(min_res, dfs(0, i, -1))
 
 print(min_res)
