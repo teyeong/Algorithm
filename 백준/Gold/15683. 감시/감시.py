@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 N, M = map(int, input().split())
 office = [list(map(int, input().split())) for _ in range(N)]
 cctvs = []
@@ -18,6 +16,7 @@ dirs = [
 
 # cctv로 감시 구역 설정
 def check_blind_spot(y, x, directions, blind_spot):
+    pos = set()
     for i in directions:
         cx, cy = x, y
         while 0 <= cx < M and 0 <= cy < N:
@@ -26,46 +25,44 @@ def check_blind_spot(y, x, directions, blind_spot):
             if 0 <= nx < M and 0 <= ny < N:
                 if blind_spot[ny][nx] == 0: # 빈 칸
                     blind_spot[ny][nx] = '#'
+                    pos.add((ny, nx))
                 elif blind_spot[ny][nx] == 6: # 벽
                     break
             else:
                 break
             
             cx, cy = nx, ny
-    return blind_spot
+    return blind_spot, pos
 
 for y in range(N):
     for x in range(M):
         if office[y][x] != '#' and 0 < office[y][x] < 6:
             if office[y][x] == 5:
-                office = check_blind_spot(y, x, range(4), office)
+                office, _ = check_blind_spot(y, x, range(4), office)
             else:
                 cctvs.append((office[y][x], y, x))
 
-min_blind_spot = N * M
+cnt = 0
+for y in range(N):
+    for x in range(M):
+        if office[y][x] == 0:
+            cnt += 1
 
-# 0 개수 세는 함수
-def count_spot(office_statement):
-    cnt = 0
-    for y in range(N):
-        for x in range(M):
-            if office_statement[y][x] == 0:
-                cnt += 1
-    return cnt
+min_blind_spot = cnt
 
 # 각 방향마다 조합해서 탐색
-def dfs(idx, office_statement):
+def dfs(idx, office_statement, cnt):
     global min_blind_spot
     
     if idx == len(cctvs):
-        cnt = count_spot(office_statement)
         min_blind_spot = min(cnt, min_blind_spot)
         return
     
     for d in dirs[cctvs[idx][0] - 1]:
-        new_office = deepcopy(office_statement)
-        new_office = check_blind_spot(cctvs[idx][1], cctvs[idx][2], d, new_office)
-        dfs(idx + 1, new_office)
+        office_statement, pos = check_blind_spot(cctvs[idx][1], cctvs[idx][2], d, office_statement)
+        dfs(idx + 1, office_statement, cnt - len(pos))
+        for y, x in pos:
+            office_statement[y][x] = 0
 
-dfs(0, office)
+dfs(0, office, min_blind_spot)
 print(min_blind_spot)
